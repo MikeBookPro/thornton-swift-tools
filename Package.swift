@@ -12,7 +12,7 @@ let package = Package(
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
             name: "thornton-swift-tools",
-            targets: ["thornton-swift-tools", "Utilities"]),
+            targets: ["thornton-swift-tools"]),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -41,17 +41,13 @@ let package = Package(
                 permissions: [
                     .writeToPackageDirectory(reason: "Writes the CodingKeys enumeration for the provided Swift element.")
                 ]
-            ),
-            dependencies: [
-                "Utilities"
-            ]
-        ),
+            )),
         
         .plugin(
             name: "GenerateContributors",
             capability: .command(
                 intent: .custom(
-                    verb: "generate-contributors-list",
+                    verb: "regenerate-contributors-list",
                     description: "Generates the CONTRIBUTORS.txt file based on Git logs"
                 ),
                 permissions: [

@@ -5,9 +5,9 @@ import PackagePlugin
 struct GenerateContributors: CommandPlugin {
     func performCommand(context: PluginContext, arguments: [String]) async throws {
         let process = Process()
-        process.executableURL = .init(string: "/usr/bin/git")
-        process.arguments = ["log", "--pretty=format: %an <%ae>%n"]
-        
+        process.executableURL = Bundle.main.url(forAuxiliaryExecutable: "/usr/bin/git") // URL(fileURLWithPath: "/usr/bin/git")
+        process.arguments = ["log", "--pretty=format:- %an <%ae>%n"]
+                
         let outputPipe = Pipe()
         process.standardOutput = outputPipe
         try process.run()
@@ -15,12 +15,13 @@ struct GenerateContributors: CommandPlugin {
         
         guard let outputData = try outputPipe.fileHandleForReading.readToEnd() else { throw GenerateContributorsError.failedToReadFile }
         let output = String(decoding: outputData, as: UTF8.self)
-        
-        try Set(output.components(separatedBy: CharacterSet.newlines))
+//        try output.write(toFile: "CONTRIBUTORS.txt", atomically: true, encoding: .utf8)
+        let contributors: String = Set(output.components(separatedBy: CharacterSet.newlines))
+            .filter { !$0.isEmpty }
             .sorted()
-            .filter(\.isEmpty.not)
             .joined(separator: "\n")
-            .write(toFile: "CONTRIBUTORS.txt", atomically: true, encoding: .utf8)
+        
+        try contributors.write(toFile: "CONTRIBUTORS.txt", atomically: true, encoding: .utf8)
     }
     
 }
