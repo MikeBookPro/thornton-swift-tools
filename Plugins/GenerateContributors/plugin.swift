@@ -15,7 +15,6 @@ struct GenerateContributors: CommandPlugin {
         
         guard let outputData = try outputPipe.fileHandleForReading.readToEnd() else { throw GenerateContributorsError.failedToReadFile }
         let output = String(decoding: outputData, as: UTF8.self)
-//        try output.write(toFile: "CONTRIBUTORS.txt", atomically: true, encoding: .utf8)
         let contributors: String = Set(output.components(separatedBy: CharacterSet.newlines))
             .filter { !$0.isEmpty }
             .sorted()
@@ -23,7 +22,6 @@ struct GenerateContributors: CommandPlugin {
         
         try contributors.write(toFile: "CONTRIBUTORS.txt", atomically: true, encoding: .utf8)
     }
-    
 }
 
 enum GenerateContributorsError: Error {
