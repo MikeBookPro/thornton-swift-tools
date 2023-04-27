@@ -30,3 +30,11 @@ enum GenerateContributorsError: Error {
 extension Bool {
     var not: Bool { !self }
 }
+
+/*
+ Create a Swift Package Plugin 
+ 
+ Xcode code snippet that can be used inside a swift class
+ or struct to create the CodingKeys enum for that class and
+ auto populates cases for each instance property of that class/struct.
+ */

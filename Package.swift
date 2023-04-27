@@ -6,43 +6,23 @@ import PackageDescription
 let package = Package(
     name: "thornton-swift-tools",
     platforms: [
-        .macOS("10.15")
+        .macOS("12.0")
     ],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
-        .library(
-            name: "thornton-swift-tools",
-            targets: ["thornton-swift-tools"]),
+//        .library(name: "thornton-swift-tools", targets: ["thornton-swift-tools"]),
+        .library(name: "IconLibrary", targets: ["IconLibrary"])
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
-        // .package(url: /* package url */, from: "1.0.0"),
+        .package(url: "https://github.com/apple/swift-syntax.git", from: "508.0.0"),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
-        .target(
-            name: "thornton-swift-tools",
-            dependencies: []),
-        .testTarget(
-            name: "thornton-swift-toolsTests",
-            dependencies: ["thornton-swift-tools"]),
+//        .target(name: "thornton-swift-tools", dependencies: []),
         
-        .target(name: "Utilities",
-               dependencies: []),
-        
-        .plugin(
-            name: "AddCodingKeys",
-            capability: .command(
-                intent: .custom(
-                    verb: "add-coding-keys-to-codable",
-                    description: "Adds the CodingKeys enumeration to the Codable element based on the element's instance properties"
-                ),
-                permissions: [
-                    .writeToPackageDirectory(reason: "Writes the CodingKeys enumeration for the provided Swift element.")
-                ]
-            )),
-        
+        // MARK: - Plugin : Generate Contributors
         .plugin(
             name: "GenerateContributors",
             capability: .command(
@@ -53,6 +33,41 @@ let package = Package(
                 permissions: [
                     .writeToPackageDirectory(reason: "This command writes the new CONTRIBUTORS.txt to the source root.")
                 ]
-            )),
+            )
+        ),
+        
+        // MARK: - Swagger Model Generation
+        .plugin(
+            name: "GenerateSwaggerModels",
+            capability: .buildTool(),
+            dependencies: ["SwaggerModelGenExec"]
+        ),
+        .executableTarget(name: "SwaggerModelGenExec"),
+        
+        
+        
+        
+        // MARK: - Icon Library
+        .target(
+            name: "IconLibrary",
+                dependencies: [],
+            plugins: [
+                "GenerateAssetConstants",
+                "GenerateSwaggerModels"
+            ]
+        ),
+        .plugin(
+            name: "GenerateAssetConstants",
+            capability: .buildTool(),
+            dependencies: ["AssetConstantsExec"]
+        ),
+        .executableTarget(name: "AssetConstantsExec"),
+        
+//        .executableTarget(
+//            name: "AddCodingKeysExecutable",
+//            dependencies: [
+//                .product(name: "SwiftSyntax", package: "swift-syntax"),
+//            ]
+//        ),
     ]
 )
