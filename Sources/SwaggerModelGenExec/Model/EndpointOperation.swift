@@ -6,7 +6,6 @@ public struct EndpointOperation: Decodable {
     public let parameters: [EndpointOperationParameter]
     public let requestBody: EndpointOperationContent?
     
-//    public typealias ResponseCode = String
     public let responses: [String: EndpointOperationContent]
     
     enum CodingKeys: String, CodingKey {
@@ -19,8 +18,3 @@ public struct EndpointOperation: Decodable {
         case responses
     }
 }
-
-
-//public struct EndpointOperationResult: Decodable {
-//    
-//}

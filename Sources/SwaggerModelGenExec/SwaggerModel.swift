@@ -1,6 +1,5 @@
 import Foundation
 
-
 struct SwaggerModel: Decodable {
     public let openAPIVersion: String
     public let servers: [Server]
@@ -18,11 +17,6 @@ struct SwaggerModel: Decodable {
         //        case externalDocs
     }
 }
-
-
-
-
-
 
 
 enum SchemaPropertyType: String {
