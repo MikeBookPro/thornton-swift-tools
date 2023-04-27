@@ -1,42 +1,21 @@
 import Foundation
 
 
-struct SwaggerModel: Codable {
+struct SwaggerModel: Decodable {
     public let openAPIVersion: String
     public let servers: [Server]
     public let tags: [Tag]
-    //    public let paths: String
+    public let paths: [String: Endpoint]
     public let components: Components
     
     enum CodingKeys: String, CodingKey {
         case openAPIVersion = "openapi"
         case servers
         case tags
-        //        case paths
+        case paths
         case components
         //        case info
         //        case externalDocs
-    }
-}
-
-
-
-
-struct Path {
-    public let tags: [String]?
-    public let summary: String?
-    let descr: String?
-    public let operationID: String?
-    //    public let parameters: String?
-    //    public let responses: String?
-    
-    enum CodingKeys: String, CodingKey {
-        case tags
-        case summary
-        case descr = "description"
-        case operationID = "operationId"
-        case parameters
-        case responses
     }
 }
 

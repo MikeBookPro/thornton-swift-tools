@@ -1,7 +1,7 @@
-public struct SchemaProperty: Codable, SchemaReferencing {
-    public let `type`: String
+public struct SchemaProperty: Decodable, SchemaReferencing {
+    public let `type`: String?
     public let `format`: String?
-    public let items: SchemaPropertyItem?
+    public let items: SchemaProperty.Item?
     public let `enum`: [String]?
     public var ref: String?
     
@@ -9,7 +9,8 @@ public struct SchemaProperty: Codable, SchemaReferencing {
     var swiftTypeName: String? {
         let reference: SchemaReferencing? = (ref != nil) ? self : self.items
         if let reference { return SchemaProperty.swift(nameForReferenced: reference) }
-        return SchemaPropertyType(rawValue: self.type)?.swiftName
+        if let type {  return SchemaPropertyType(rawValue: type)?.swiftName }
+        return ""
     }
     
     enum CodingKeys: String, CodingKey {
@@ -18,5 +19,13 @@ public struct SchemaProperty: Codable, SchemaReferencing {
         case items
         case `enum`
         case ref = "$ref"
+    }
+    
+    public struct Item: Decodable, SchemaReferencing {
+        public var ref: String?
+        
+        enum CodingKeys: String, CodingKey {
+            case ref = "$ref"
+        }
     }
 }

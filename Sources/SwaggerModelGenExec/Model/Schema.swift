@@ -1,4 +1,4 @@
-public struct Schema: Codable {
+public struct Schema: Decodable {
     public let `type`: String
     public let properties: [String: SchemaProperty]
     

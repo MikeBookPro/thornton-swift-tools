@@ -1,4 +1,4 @@
-public struct Tag: Codable, CustomStringConvertible {
+public struct Tag: Decodable, CustomStringConvertible {
     public let name: String
     let descr: String
     

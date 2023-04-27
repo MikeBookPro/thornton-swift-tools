@@ -1,4 +1,4 @@
-public struct Server: Codable {
+public struct Server: Decodable {
     public let urlString: String
     
     enum CodingKeys: String, CodingKey {

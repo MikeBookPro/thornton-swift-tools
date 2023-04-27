@@ -1,4 +1,4 @@
-public struct Components: Codable {
+public struct Components: Decodable {
     public let schemas: [String: Schema]
     
     // TODO: Move this out of model Codable and into own `SwiftBuilder`
