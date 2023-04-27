@@ -19,25 +19,8 @@ struct SwaggerModel: Codable {
     }
 }
 
-struct Server: Codable {
-    public let urlString: String
-    
-    enum CodingKeys: String, CodingKey {
-        case urlString = "url"
-    }
-}
 
-struct Tag: Codable, CustomStringConvertible {
-    public let name: String
-    let descr: String
-    
-    public var description: String { descr }
-    
-    enum CodingKeys: String, CodingKey {
-        case name
-        case descr = "description"
-    }
-}
+
 
 struct Path {
     public let tags: [String]?
@@ -57,96 +40,11 @@ struct Path {
     }
 }
 
-struct Components: Codable {
-    public let schemas: [String: Schema]
-    
-    var swiftCode: [String] {
-        self.schemas.keys
-            .sorted()
-            .reduce(["import Foundation\n"]) { partialResult, structName in
-                guard let schema = self.schemas[structName] else { return partialResult }
-                let code = """
-                public struct \(structName): Codable {
-                    \(schema.swiftInstanceVariables.joined(separator: "\n\t"))
-                
-                    \(schema.swiftInitializer)
-                }
-                
-                """
-                return partialResult + [code]
-            }
-    }
-}
 
-struct Schema: Codable {
-    public let `type`: String
-    public let properties: [String: SchemaProperty]
-    
-    private var variableNameAndTypes: [(name: String, typeName: String)] {
-        self.properties.keys
-            .sorted()
-            .reduce([(String, String)]()) { partialResult, key in
-                guard
-                    let property = self.properties[key],
-                    let typeName = property.swiftTypeName else { return partialResult }
-                return partialResult + [(key, typeName)]
-            }
-    }
-    
-    var swiftInstanceVariables: [String] {
-        self.variableNameAndTypes.map { "public let \($0.name): \($0.typeName)?" }
-    }
-    
-    
-    var swiftInitializer: String {
-        var parameters: [String] = []
-        var assignment: [String] = []
-        self.variableNameAndTypes.forEach { (name, typeName) in
-            parameters.append("\(name): \(typeName)? = nil")
-            assignment.append("self.\(name) = \(name)")
-        }
-        return """
-        init(\(parameters.formatted(.list(type: .and, width: .narrow)))) {
-                \(assignment.joined(separator: "\n\t\t"))
-            }
-        """
-    }
-}
 
-protocol SchemaReferencing {
-    var ref: String? { get set }
-    
-    static func swift(nameForReferenced schema: some SchemaReferencing) -> String?
-}
 
-extension SchemaReferencing {
-    static func swift(nameForReferenced schema: some SchemaReferencing) -> String? {
-        guard let last = schema.ref?.split(separator: "/").last else { return "" }
-        return String(last)
-    }
-}
 
-struct SchemaProperty: Codable, SchemaReferencing {
-    public let `type`: String
-    public let `format`: String?
-    public let items: SchemaPropertyItem?
-    public let `enum`: [String]?
-    public var ref: String?
-    
-    var swiftTypeName: String? {
-        let reference: SchemaReferencing? = (ref != nil) ? self : self.items
-        if let reference { return SchemaProperty.swift(nameForReferenced: reference) }
-        return SchemaPropertyType(rawValue: self.type)?.swiftName
-    }
-    
-    enum CodingKeys: String, CodingKey {
-        case `type`
-        case `format`
-        case items
-        case `enum`
-        case ref = "$ref"
-    }
-}
+
 
 enum SchemaPropertyType: String {
     case boolean
@@ -230,10 +128,4 @@ enum SchemaPropertyType: String {
     
 }
 
-struct SchemaPropertyItem: Codable, SchemaReferencing {
-    public var ref: String?
-    
-    enum CodingKeys: String, CodingKey {
-        case ref = "$ref"
-    }
-}
+
