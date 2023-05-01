@@ -21,17 +21,16 @@
     },
     "servers": [
         {
-            "url": "https://www.themealdb.com/api/json/v1/1"
+            "url": "https://www.themealdb.com"
         }
     ],
     "tags": [
         {
             "name": "meals",
             "description": "Some tasty stuff"
-        }
-    ],
+        }           ],
     "paths": {
-        "/filter.php": {
+        "/api/json/v1/1/filter.php": {
             "get": {
                 "tags": [
                     "meals"
@@ -72,7 +71,7 @@
                 }
             }
         },
-        "/lookup.php": {
+        "/api/json/v1/1/lookup.php": {
             "get": {
                 "tags": [
                     "meals"
@@ -308,7 +307,26 @@
                         "type": "string"
                     }
                 }
-            }
+            },
+            "MealCategory": {
+              "type": "string",
+              "enum": [
+                "beef",
+                "breakfast",
+                "chicken",
+                "dessert",
+                "goat",
+                "lamb",
+                "miscellaneous",
+                "pasta",
+                "pork",
+                "seafood",
+                "side",
+                "starter",
+                "vegan",
+                "vegetarian"
+              ]
+            },
         }
     }
 }

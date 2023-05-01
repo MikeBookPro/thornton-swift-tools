@@ -1,7 +1,9 @@
+import Foundation
+
 public struct EndpointOperation: Decodable {
     public let tags: [String]
-    public let summary: String
-    public let description: String
+    public let summary: String?
+    public let description: String?
     public let operationID: String
     public let parameters: [EndpointOperationParameter]
     public let requestBody: EndpointOperationContent?

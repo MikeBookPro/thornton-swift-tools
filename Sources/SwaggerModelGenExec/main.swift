@@ -10,7 +10,13 @@ let jsonURL = URL(fileURLWithPath: input)
 let json = try Data(contentsOf: jsonURL)
 let swagger = try JSONDecoder().decode(SwaggerModel.self, from: json)
 
-let code = swagger.components.swiftCode.joined(separator: "\n")
+let baseURL = swagger.servers.first?.urlString ?? ""
+
+let code = """
+\(SwaggerModel.NetworkModel.string(for: swagger))
+
+\(SwaggerModel.NetworkAPI.string(for: swagger))
+"""
 try code.write(to: URL(fileURLWithPath: output), atomically: true, encoding: .utf8)
 
 

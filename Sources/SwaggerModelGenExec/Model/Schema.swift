@@ -1,16 +1,22 @@
 public struct Schema: Decodable {
     public let `type`: String
-    public let properties: [String: SchemaProperty]
+    public let properties: [String: SchemaProperty]?
+    public let enumCases: [String]?
+    
+    enum CodingKeys: String, CodingKey {
+        case `type`
+        case properties
+        case enumCases = "enum"
+    }
     
     // TODO: Move this out of model Codable and into own `SwiftBuilder`
     private var variableNameAndTypes: [(name: String, typeName: String)] {
-        self.properties.keys
+        guard let properties else { return [] }
+        return properties.keys
             .sorted()
             .reduce([(String, String)]()) { partialResult, key in
-                guard
-                    let property = self.properties[key],
-                    let typeName = property.swiftTypeName else { return partialResult }
-                return partialResult + [(key, typeName)]
+                guard let property = properties[key] else { return partialResult }
+                return partialResult + [(key, SwaggerModel.SchemaPropertyTypeName.string(for: property))]
             }
     }
     

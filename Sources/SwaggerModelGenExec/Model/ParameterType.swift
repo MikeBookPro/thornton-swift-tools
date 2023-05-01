@@ -10,8 +10,8 @@ public enum ParameterType: String, ExpressibleByStringLiteral, Decodable {
     public init(stringLiteral value: String) {
         switch value.lowercased() {
             case "query": self = .query
-            case "header": self = .header
             case "path": self = .path
+            case "header": self = .header
             case "cookie": self = .cookie
             default: self = .unknown
         }

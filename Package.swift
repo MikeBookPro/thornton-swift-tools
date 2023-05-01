@@ -7,6 +7,7 @@ let package = Package(
     name: "thornton-swift-tools",
     platforms: [
         .macOS("12.0")
+//        .macOS("13.3.1")
     ],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.

@@ -16,8 +16,16 @@ struct SwaggerModel: Decodable {
         //        case info
         //        case externalDocs
     }
+    
 }
 
+// functionName: "listMealsByCategory" (Swagger.paths/{path.key})
+
+// http request type: "get" (Swagger.path/{path.key}/{http type}/operationId --> Swagger.path["/lookup.php"]["get"].operationID)
+
+// parameterName: "c" (Swagger.path/{path.key}/{http type}/parameters[int].parameterType --> Swagger.path["/lookup.php"]["get"].parameters[0].parameterType)
+// parameterType: "MealCategory" (Swagger.path/{path.key}/{http type}/parameters[int].parameterType --> Swagger.path["/lookup.php"]["get"].parameters[0].parameterType)
+// parameterTypeOptional: "?" [or ""] (Swagger.path/{path.key}/{http type}/parameters[int].parameterType --> Swagger.path["/lookup.php"]["get"].parameters[0].isRequired
 
 enum SchemaPropertyType: String {
     case boolean
