@@ -1,6 +1,6 @@
 extension String {
     var lowercasedFirstCharacter: String {
-        (self.isEmpty) ? self : input.prefix(1).lowercased() + input.dropFirst()
+        (self.isEmpty) ? self : String(self.prefix(1).lowercased() + self.dropFirst())
     }
     
     func replacing(templates: [(target: String, replacement: String)]) -> String {
@@ -74,6 +74,8 @@ extension SwaggerModel {
         }
     }
     
+    
+    
     enum EndpointOperationNetworkRequest {
         
         static func string(for endpointOperation: EndpointOperation) -> String {
@@ -81,7 +83,7 @@ extension SwaggerModel {
             let parameterComponents = endpointOperation.parameters
                 .compactMap({ SwaggerModel.QueryParameter.components(for: $0, shouldProvideInternalName: true) })
             let queryItems: String = parameterComponents
-                .map({ "URLQueryItem(name: \"\($0.name)\", value: \($0.internalName))" })
+                .map({ "URLQueryItem(name: \"\($0.name)\", value: \($0.invokedName))" })
                 .joined(separator: ",\n\t")
             let urlQueryInvocationParameters: String = parameterComponents
                 .map({ "\($0.name): \($0.internalName)" })
@@ -93,34 +95,78 @@ extension SwaggerModel {
             let operationSummary = (endpointOperation.summary == nil) ? "" : "/// \(endpointOperation.summary ?? "")"
             let operationDescription = (endpointOperation.description == nil) ? "" : """
             ///
-            /// \(endpointOperation.description ?? "")
+            \t/// \(endpointOperation.description ?? "")
             """
-            let responseTypeName = SwaggerModel.EndpointOperationResponseTypeName.string(for: endpointOperation, accept: .json)
+            let responseTypeName = SwaggerModel.EndpointOperationNetworkResponse.string(for: endpointOperation)
             
             return """
             
-            \(operationSummary)
-            \(operationDescription)
-            public static func \(operationID)(\(urlQueryParameters)) async -> \(responseTypeName)? {
-                guard let url = \(operationID)URL(\(urlQueryInvocationParameters) else { return nil }
-                var request = URLRequest(url: url)
-                request.httpMethod = \"<HTTP_REQUEST_TYPE>\"
-                let (data, response) = try await URLSession.shared.data(for: request)
-                
-                guard (response as? HTTPURLResponse)?.statusCode == 200 else { return nil }
-                return try JSONDecoder().decode(\(responseTypeName).self, from: data)
-            }
+                \(operationSummary)
+                \(operationDescription)
+                public static func \(operationID)(\(urlQueryParameters)) async throws -> \(responseTypeName)? {
+                    guard let url = \(operationID)URL(\(urlQueryInvocationParameters)) else { return nil }
+                    var request = URLRequest(url: url)
+                    request.httpMethod = \"<HTTP_REQUEST_TYPE>\"
+                    let (data, response) = try await URLSession.shared.data(for: request)
+                    
+                    guard (response as? HTTPURLResponse)?.statusCode == 200 else { return nil }
+                    return try JSONDecoder().decode(\(responseTypeName).self, from: data)
+                }
 
-            private static func \(operationID)URL(\(urlQueryParameters)) -> URL? {
-                var urlComponents = URLComponents()
-                urlComponents.path = \"<URL_PATH>\"
-                urlComponents.queryItems = [
-                    \(queryItems)
-                ]
-                return urlComponents.url(relativeTo: URL(string: \"<URL_HOST>\"))
-            }
+                private static func \(operationID)URL(\(urlQueryParameters)) -> URL? {
+                    var urlComponents = URLComponents()
+                    urlComponents.path = \"<URL_PATH>\"
+                    urlComponents.queryItems = [
+                        \(queryItems)
+                    ]
+                    return urlComponents.url(relativeTo: URL(string: \"<URL_HOST>\"))
+                }
             
             """
+        }
+    }
+    
+    enum EndpointOperationNetworkResponse {
+        static func string(for endpointOperation: EndpointOperation) -> String {
+            guard let response = endpointOperation.responses["200"], let content = response.content else { return "{- EndpointOperationNetworkResponse -}" }
+            return Self.string(for: content)
+        }
+        
+        private static func string(for encodedContent: EndpointOperationContentEncoding) -> String {
+//            return "\(encodedContent.json?.schema)"
+            Self.components(for: encodedContent)
+                .filter({ (encodingTypeName, encodedResultPath) in
+                    ResponseContentEncodingType(rawValue: encodingTypeName) == .json
+                })
+                .compactMap {
+                    let (_, encodedResultPath) = $0 // TODO: Use encodingTypeName to accept more than content/json
+                    guard let encodedResult = encodedContent[keyPath: encodedResultPath] else { return nil }
+                    return Self.string(for: encodedResult)
+                }
+                .first ?? "{- EndpointNetworkResponse.string(for: EndpointOperationContentEncoding) -}"
+        }
+        
+        private static func string(for responseSchema: SchemaProperty) -> String {
+            let referenceSchema: SchemaReferencing? = (responseSchema.ref != nil) ? responseSchema : responseSchema.items
+            if let reference = referenceSchema {
+                let referenceTypeName = SchemaReferencingTypeName.string(for: reference)
+                return (responseSchema.type == "array") ? "[\(referenceTypeName)]" : referenceTypeName
+            }
+            if let propertyType = responseSchema.type {  return SimplePropertyTypeName.string(for: propertyType, formatType: responseSchema.format) }
+            return "{- EndpointOperationNetworkResponse test-}"
+        }
+        
+        private static func components(for contentEncoding: EndpointOperationContentEncoding) -> [(encodingTypeName: String, encodedResultPath: KeyPath<EndpointOperationContentEncoding, SchemaProperty?>)] {
+            var result = [(encodingTypeName: String, encodedResultPath: KeyPath<EndpointOperationContentEncoding, SchemaProperty?>)]()
+            if contentEncoding.any != nil { result.append((ResponseContentEncodingType.any.rawValue, \.any?.schema )) }
+            if contentEncoding.json != nil { result.append((ResponseContentEncodingType.json.rawValue, \.json?.schema )) }
+            if contentEncoding.xml != nil { result.append((ResponseContentEncodingType.xml.rawValue, \.xml?.schema )) }
+            if contentEncoding.plainText != nil { result.append((ResponseContentEncodingType.plainText.rawValue, \.plainText?.schema )) }
+            if contentEncoding.htmlText != nil { result.append((ResponseContentEncodingType.htmlText.rawValue, \.htmlText?.schema )) }
+            if contentEncoding.octetStream != nil { result.append((ResponseContentEncodingType.octetStream.rawValue, \.octetStream?.schema )) }
+            if contentEncoding.formData != nil { result.append((ResponseContentEncodingType.formData.rawValue, \.formData?.schema )) }
+            if contentEncoding.formURL != nil { result.append((ResponseContentEncodingType.formURL.rawValue, \.formURL?.schema )) }
+            return result.isEmpty ? [(encodingTypeName: "{- EndpointOperationResponseTypeName -}", encodedResultPath: \.any?.schema )] : result
         }
     }
     
@@ -162,7 +208,6 @@ extension SwaggerModel {
             return schemas.reduce(into: "") { (partialResult, input) in
                 let (enumName, schema) = input
                 guard schema.type == "string", let enumCases = schema.enumCases else { return }
-                let components = SwaggerModel.SchemaProperties.components(for: schema)
                 
                 let cases = enumCases.reduce(into: "") { (partialResult, input) in
                     partialResult.append("case \(input)\n\t")
@@ -178,7 +223,6 @@ extension SwaggerModel {
         }
     }
     
-    
     enum SchemaProperties {
         static func components(for schema: Schema) -> [(name: String, typeName: String)] {
             guard let properties = schema.properties else { return [] }
@@ -192,14 +236,27 @@ extension SwaggerModel {
     enum QueryParameter {
         static func string(for parameter: EndpointOperationParameter, shouldProvideInternalName hasInternalName: Bool = false) -> String? {
             guard let components = components(for: parameter, shouldProvideInternalName: hasInternalName) else { return nil }
-            return "\(components.name)\(components.internalName): \(components.typeName)"
+            return "\(components.name) \(components.internalName): \(components.typeName)"
         }
         
-        static func components(for parameter: EndpointOperationParameter, shouldProvideInternalName hasInternalName: Bool = false) -> (name: String, internalName: String, typeName: String)? {
+        static func components(for parameter: EndpointOperationParameter, shouldProvideInternalName hasInternalName: Bool = false) -> (name: String, internalName: String, typeName: String, invokedName: String)? {
             guard parameter.parameterType == .query, let schema = parameter.schema else { return nil }
             let parameterTypeName = "\(SchemaPropertyTypeName.string(for: schema))\(parameter.isRequired ? "" : "?")"
-            let internalParameterName = (hasInternalName) ? " \(SchemaPropertyInternalParameterName.string(for: schema))" : ""
-            return (name: parameter.name, internalName: internalParameterName, typeName: parameterTypeName)
+            let internalParameterName = (hasInternalName) ? "\(SchemaPropertyInternalParameterName.string(for: schema))" : ""
+            let invokedName = (hasInternalName) ? QueryParameterSchemaInvokedName.string(for: schema) ?? internalParameterName : internalParameterName
+            return (name: parameter.name, internalName: internalParameterName, typeName: parameterTypeName, invokedName: invokedName)
+        }
+    }
+    
+    enum QueryParameterSchemaInvokedName {
+        private static let valueTypeNames: Set<String> = .init(["boolean", "integer", "number"])
+        private static func isValueTypeName(_ value: String) -> Bool { valueTypeNames.contains(value) }
+        
+        static func string(for schemaProperty: SchemaProperty) -> String? {
+            let reference: SchemaReferencing? = (schemaProperty.ref != nil) ? schemaProperty : schemaProperty.items
+            if let reference { return SchemaReferencingTypeName.string(for: reference).lowercasedFirstCharacter + ".rawValue" }
+            if let propertyType = schemaProperty.type, isValueTypeName(propertyType) { return "\"\\(value)\"" }
+            return "{- QueryParameterSchemaInvokedName -}"
         }
     }
     
@@ -248,13 +305,17 @@ extension SwaggerModel {
             simpleTypeNames.contains(value)
         }
         
+        
         static func string(for schemaProperty: SchemaProperty) -> String {
             let reference: SchemaReferencing? = (schemaProperty.ref != nil) ? schemaProperty : schemaProperty.items
             if let reference { return SchemaReferencingTypeName.string(for: reference).lowercasedFirstCharacter }
             if let propertyType = schemaProperty.type, isSimplePropertyTypeName(propertyType) { return "value" }
             return "{- SchemaPropertyInternalParameterName -}"
         }
+        
+        
     }
+    
     
     enum ResponseContentEncodingType: String {
         case any = "*/*"
@@ -267,24 +328,4 @@ extension SwaggerModel {
         case formURL = "application/x-www-form-urlencoded"
     }
     
-    
-    enum EndpointOperationResponseTypeName {
-        static func string(for endpointOperation: EndpointOperation, accept encoding: ResponseContentEncodingType) -> String {
-            guard
-                let response = endpointOperation.responses["200"],
-                let responseSchema = response.content?[encoding.rawValue]
-            else { return "{- EndpointOperationResponseTypeName -}" }
-            return Self.string(for: responseSchema)
-        }
-        
-        private static func string(for responseSchema: SchemaProperty) -> String {
-            let reference: SchemaReferencing? = (responseSchema.ref != nil) ? responseSchema : responseSchema.items
-            if let reference {
-                let referenceTypeName = SchemaReferencingTypeName.string(for: reference)
-                return (responseSchema.type == "array") ? "[\(referenceTypeName)]" : referenceTypeName
-            }
-            if let propertyType = responseSchema.type {  return SimplePropertyTypeName.string(for: propertyType, formatType: responseSchema.format) }
-            return "{- EndpointOperationResponseTypeName -}"
-        }
-    }
 }
