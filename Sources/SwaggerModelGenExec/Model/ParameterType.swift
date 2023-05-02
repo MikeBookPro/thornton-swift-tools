@@ -1,6 +1,5 @@
 public enum ParameterType: String, ExpressibleByStringLiteral, Decodable {
     public typealias StringLiteralType = String
-    
     case unknown
     case query
     case header

@@ -1,7 +1,7 @@
 public struct EndpointOperationContent: Decodable {
     public let description: String
-    // String here is the HTTP Response code, ex: "200"
-    public let content: EndpointOperationContentEncoding? // EncodingType
+    /// EncodingType
+    public let content: EndpointOperationContentEncoding?
 }
 
 public struct EndpointOperationContentEncoding: Decodable {

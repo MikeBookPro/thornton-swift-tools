@@ -7,7 +7,8 @@ public struct EndpointOperation: Decodable {
     public let operationID: String
     public let parameters: [EndpointOperationParameter]
     public let requestBody: EndpointOperationContent?
-    // String here is the HTTP Response code, ex: "200"
+    
+    /// String here is the HTTP Response code, ex: "200"
     public let responses: [String: EndpointOperationContent]
     
     enum CodingKeys: String, CodingKey {
