@@ -5,7 +5,12 @@ extension SwaggerModel {
             let structCode = SwaggerModel.SchemaStruct.string(for: swaggerModel.components.schemas)
             let enumCode = SwaggerModel.SchemaEnum.string(for: swaggerModel.components.schemas)
             
-            return [structCode, enumCode].joined(separator: "\n")
+            return """
+            public enum NetworkModel {
+                \([structCode, enumCode].joined(separator: "\n"))
+            }
+            """
+            
         }
     }
     
@@ -137,7 +142,7 @@ extension SwaggerModel {
         private static func string(for responseSchema: SchemaProperty) -> String {
             let referenceSchema: SchemaReferencing? = (responseSchema.ref != nil) ? responseSchema : responseSchema.items
             if let reference = referenceSchema {
-                let referenceTypeName = SchemaReferencingTypeName.string(for: reference)
+                let referenceTypeName = "NetworkModel.\(SchemaReferencingTypeName.string(for: reference))"
                 return (responseSchema.type == "array") ? "[\(referenceTypeName)]" : referenceTypeName
             }
             if let propertyType = responseSchema.type {  return SimplePropertyTypeName.string(for: propertyType, formatType: responseSchema.format) }
@@ -165,7 +170,7 @@ extension SwaggerModel {
                 guard schema.type == "object" else { return }
                 let components = SwaggerModel.SchemaProperties.components(for: schema)
                 let properties = components.reduce(into: "") { (partialResult, input) in
-                    partialResult.append("public let \(input.name): \(input.typeName)?\n\t")
+                    partialResult.append("public let \(input.name): \(input.typeName)?\n\t\t")
                 }
                 
                 let parameters = components.reduce(into: "") { (partialResult, input) in
@@ -173,17 +178,17 @@ extension SwaggerModel {
                 }
                 
                 let assignment = components.reduce(into: "") { (partialResult, input) in
-                    partialResult.append("self.\(input.name) = \(input.name)\n\t\t")
+                    partialResult.append("self.\(input.name) = \(input.name)\n\t\t\t")
                 }
                 
                 let structCode = """
                 
-                public struct \(structName): Codable {
-                    \(properties)
-                    init(\(parameters)) {
-                        \(assignment)
+                    public struct \(structName): Codable {
+                        \(properties)
+                        public init(\(parameters)) {
+                            \(assignment)
+                        }
                     }
-                }
                 
                 """
                 partialResult.append(structCode)
@@ -198,13 +203,13 @@ extension SwaggerModel {
                 guard schema.type == "string", let enumCases = schema.enumCases else { return }
                 
                 let cases = enumCases.reduce(into: "") { (partialResult, input) in
-                    partialResult.append("case \(input)\n\t")
+                    partialResult.append("case \(input)\n\t\t")
                 }
                 
                 let code = """
-                public enum \(enumName): String {
-                    \(cases)
-                }
+                    public enum \(enumName): String {
+                        \(cases)
+                    }
                 """
                 partialResult.append(code)
             }
@@ -252,7 +257,7 @@ extension SwaggerModel {
         static func string(for schemaProperty: SchemaProperty) -> String {
             let reference: SchemaReferencing? = (schemaProperty.ref != nil) ? schemaProperty : schemaProperty.items
             if let reference {
-                let referenceTypeName = SchemaReferencingTypeName.string(for: reference)
+                let referenceTypeName = "NetworkModel.\(SchemaReferencingTypeName.string(for: reference))"
                 return (schemaProperty.type == "array") ? "[\(referenceTypeName)]" : referenceTypeName
             }
             
