@@ -37,7 +37,7 @@
                 ],
                 "summary": "List meals in category",
                 "description": "List meals for a specified category",
-                "operationId": "listMealsByCategory",
+                "operationId": "fetchCategoryMeals",
                 "parameters": [
                     {
                         "name": "c",
@@ -57,10 +57,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/MealsResponse"
-                                    }
+                                    "$ref": "#/components/schemas/MealsResponse"
                                 }
                             }
                         }
@@ -78,7 +75,7 @@
                 ],
                 "summary": "Meal details",
                 "description": "Lookup the details for a specified meal",
-                "operationId": "lookupDetailsByMealID",
+                "operationId": "fetchMealDetails",
                 "parameters": [
                     {
                         "name": "i",
@@ -99,10 +96,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/MealsResponse"
-                                    }
+                                    "$ref": "#/components/schemas/MealDetailResponse"
                                 }
                             }
                         }
@@ -123,6 +117,17 @@
                         "type": "array",
                         "items": {
                             "$ref": "#/components/schemas/Meal"
+                        }
+                    }
+                }
+            },
+            "MealDetailResponse": {
+                "type": "object",
+                "properties": {
+                    "meals": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/MealDetail"
                         }
                     }
                 }
