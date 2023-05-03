@@ -219,10 +219,12 @@ extension SwaggerModel {
     enum SchemaProperties {
         static func components(for schema: Schema) -> [(name: String, typeName: String)] {
             guard let properties = schema.properties else { return [] }
-            return properties.keys.sorted().reduce([(name: String, typeName: String)]()) { partialResult, propertyName in
-                guard let property = properties[propertyName] else { return partialResult }
-                return partialResult + [(name: propertyName, typeName: SwaggerModel.SchemaPropertyTypeName.string(for: property))]
-            }
+            return properties.keys
+                .sorted(by: String.alphabeticalPrefixThenDigitOrder)
+                .reduce([(name: String, typeName: String)]()) { partialResult, propertyName in
+                    guard let property = properties[propertyName] else { return partialResult }
+                    return partialResult + [(name: propertyName, typeName: SwaggerModel.SchemaPropertyTypeName.string(for: property))]
+                }
         }
     }
     
