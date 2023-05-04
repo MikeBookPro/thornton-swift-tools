@@ -45,13 +45,19 @@ let package = Package(
         ),
         .executableTarget(name: "SwaggerModelGenExec"),
         
-        
+        // MARK: - NetworkDownloadServices
+        .target(
+            name: "NetworkDownloadServices",
+            dependencies: []
+        ),
         
         
         // MARK: - Icon Library
         .target(
             name: "IconLibrary",
-                dependencies: [],
+            dependencies: [
+                "NetworkDownloadServices"
+            ],
             plugins: [
                 "GenerateAssetConstants",
                 "GenerateSwaggerModels"

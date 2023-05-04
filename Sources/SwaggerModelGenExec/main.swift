@@ -14,6 +14,8 @@ let baseURL = swagger.servers.first?.urlString ?? ""
 
 let code = """
 import Foundation
+import NetworkDownloadServices
+
 \(SwaggerModel.NetworkModel.string(for: swagger))
 
 \(SwaggerModel.NetworkAPI.string(for: swagger))

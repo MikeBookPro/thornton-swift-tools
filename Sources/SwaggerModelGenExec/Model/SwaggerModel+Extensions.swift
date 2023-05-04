@@ -91,8 +91,18 @@ extension SwaggerModel {
             \t/// \(endpointOperation.description ?? "")
             """
             let responseTypeName = SwaggerModel.EndpointOperationNetworkResponse.string(for: endpointOperation)
+            let downloaderNamePrefix = String(responseTypeName.split(separator: ".").last ?? "{- EndpointOperationNetworkRequest -}")
             
             return """
+                final class \(downloaderNamePrefix)Downloader: NetworkDownloadServiceRepresentable {
+                    typealias Item = \(responseTypeName)
+            
+                    var taskCache: NetworkServices.TaskCache<Item> = .init()
+            
+                    static let shared: \(downloaderNamePrefix)Downloader = .init()
+            
+                    private init() {}
+                }
             
                 \(operationSummary)
                 \(operationDescription)
@@ -100,10 +110,7 @@ extension SwaggerModel {
                     guard let url = \(operationID)URL(\(urlQueryInvocationParameters)) else { return nil }
                     var request = URLRequest(url: url)
                     request.httpMethod = \"<HTTP_REQUEST_TYPE>\"
-                    let (data, response) = try await URLSession.shared.data(for: request)
-                    
-                    guard (response as? HTTPURLResponse)?.statusCode == 200 else { return nil }
-                    return try JSONDecoder().decode(\(responseTypeName).self, from: data)
+                    return try await \(downloaderNamePrefix)Downloader.shared.fetch(for: request)
                 }
 
                 private static func \(operationID)URL(\(urlQueryParameters)) -> URL? {
@@ -183,7 +190,7 @@ extension SwaggerModel {
                 
                 let structCode = """
                 
-                    public struct \(structName): Codable {
+                    public struct \(structName): Decodable, DataInitializable {
                         \(properties)
                         public init(\(parameters)) {
                             \(assignment)
