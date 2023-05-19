@@ -1,3 +1,4 @@
 public struct Components: Decodable {
-    public let schemas: [String: Schema]
+  public let schemas: [String: Schema]
 }
+

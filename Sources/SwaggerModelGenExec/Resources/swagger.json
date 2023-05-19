@@ -1,337 +1,338 @@
 {
-    "openapi": "3.1.0",
-    "info": {
-        "title": "Fetch iOS - The Meal DB Assignment",
-        "description": "This is a sample Pet Store Server based on the OpenAPI 3.1 specification.  You can find out more about\nSwagger at [https://swagger.io](https://swagger.io). In the third iteration of the pet store, we've switched to the design first approach!\nYou can now help us improve the API whether it's by making changes to the definition itself or to the code.\nThat way, with time, we can improve the API in general, and expose some of the new features in OAS3.\n\nSome useful links:\n- [The Meal DB](https://www.themealdb.com/api.php)\n- [The source API definition for the Pet Store](https://github.com/swagger-api/swagger-petstore/blob/master/src/main/resources/openapi.yaml)",
-        "termsOfService": "http://swagger.io/terms/",
-        "contact": {
-            "name": "Mike Thornton",
-            "url": "https://www.linkedin.com/in/mpthornton/",
-            "email": "mthornt@icloud.com"
-        },
-        "license": {
-            "name": "Apache 2.0",
-            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
-        },
-        "version": "1.0.11"
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Fetch iOS - The Meal DB Assignment",
+    "description": "This is a sample Pet Store Server based on the OpenAPI 3.1 specification.  You can find out more about\nSwagger at [https://swagger.io](https://swagger.io). In the third iteration of the pet store, we've switched to the design first approach!\nYou can now help us improve the API whether it's by making changes to the definition itself or to the code.\nThat way, with time, we can improve the API in general, and expose some of the new features in OAS3.\n\nSome useful links:\n- [The Meal DB](https://www.themealdb.com/api.php)\n- [The source API definition for the Pet Store](https://github.com/swagger-api/swagger-petstore/blob/master/src/main/resources/openapi.yaml)",
+    "termsOfService": "http://swagger.io/terms/",
+    "contact": {
+      "name": "Mike Thornton",
+      "url": "https://www.linkedin.com/in/mpthornton/",
+      "email": "mthornt@icloud.com"
     },
-    "externalDocs": {
-        "description": "Find out more about Swagger",
-        "url": "http://swagger.io"
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "servers": [
-        {
-            "url": "https://www.themealdb.com"
-        }
-    ],
-    "tags": [
-        {
-            "name": "meals",
-            "description": "Some tasty stuff"
-        }           ],
-    "paths": {
-        "/api/json/v1/1/filter.php": {
-            "get": {
-                "tags": [
-                    "meals"
-                ],
-                "summary": "List meals in category",
-                "description": "List meals for a specified category",
-                "operationId": "fetchCategoryMeals",
-                "parameters": [
-                    {
-                        "name": "c",
-                        "in": "query",
-                        "description": "The category name",
-                        "required": true,
-                        "schema": {
-                            "description": "Meal category name",
-                            "example": "dessert",
-                            "$ref": "#/components/schemas/MealCategory"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "successful operation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/MealsResponse"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid status value"
-                    }
-                }
-            }
-        },
-        "/api/json/v1/1/lookup.php": {
-            "get": {
-                "tags": [
-                    "meals"
-                ],
-                "summary": "Meal details",
-                "description": "Lookup the details for a specified meal",
-                "operationId": "fetchMealDetails",
-                "parameters": [
-                    {
-                        "name": "i",
-                        "in": "query",
-                        "description": "The meal ID",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "format": "int32",
-                            "description": "the meal",
-                            "example": 52772
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "successful operation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/MealDetailResponse"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid status value"
-                    }
-                }
-            }
-        }
-    },
-    "components": {
-        "schemas": {
-            "MealsResponse": {
-                "type": "object",
-                "properties": {
-                    "meals": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/Meal"
-                        }
-                    }
-                }
-            },
-            "MealDetailResponse": {
-                "type": "object",
-                "properties": {
-                    "meals": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/MealDetail"
-                        }
-                    }
-                }
-            },
-            "Meal": {
-                "type": "object",
-                "properties": {
-                    "strMeal": {
-                        "type": "string"
-                    },
-                    "strMealThumb": {
-                        "type": "string",
-                        "format": "uri"
-                    },
-                    "idMeal": {
-                        "type": "string"
-                    }
-                }
-            },
-            "MealDetail": {
-                "type": "object",
-                "properties": {
-                    "idMeal": {
-                        "type": "string"
-                    },
-                    "strMeal": {
-                        "type": "string"
-                    },
-                    "strDrinkAlternate": {
-                        "type": "string"
-                    },
-                    "strCategory": {
-                        "type": "string"
-                    },
-                    "strArea": {
-                        "type": "string"
-                    },
-                    "strInstructions": {
-                        "type": "string"
-                    },
-                    "strMealThumb": {
-                        "type": "string",
-                        "format": "uri"
-                    },
-                    "strTags": {
-                        "type": "string"
-                    },
-                    "strYoutube": {
-                        "type": "string",
-                        "format": "uri"
-                    },
-                    "strIngredient1": {
-                        "type": "string"
-                    },
-                    "strIngredient2": {
-                        "type": "string"
-                    },
-                    "strIngredient3": {
-                        "type": "string"
-                    },
-                    "strIngredient4": {
-                        "type": "string"
-                    },
-                    "strIngredient5": {
-                        "type": "string"
-                    },
-                    "strIngredient6": {
-                        "type": "string"
-                    },
-                    "strIngredient7": {
-                        "type": "string"
-                    },
-                    "strIngredient8": {
-                        "type": "string"
-                    },
-                    "strIngredient9": {
-                        "type": "string"
-                    },
-                    "strIngredient10": {
-                        "type": "string"
-                    },
-                    "strIngredient11": {
-                        "type": "string"
-                    },
-                    "strIngredient12": {
-                        "type": "string"
-                    },
-                    "strIngredient13": {
-                        "type": "string"
-                    },
-                    "strIngredient14": {
-                        "type": "string"
-                    },
-                    "strIngredient15": {
-                        "type": "string"
-                    },
-                    "strIngredient16": {
-                        "type": "string"
-                    },
-                    "strIngredient17": {
-                        "type": "string"
-                    },
-                    "strIngredient18": {
-                        "type": "string"
-                    },
-                    "strIngredient19": {
-                        "type": "string"
-                    },
-                    "strIngredient20": {
-                        "type": "string"
-                    },
-                    "strMeasure1": {
-                        "type": "string"
-                    },
-                    "strMeasure2": {
-                        "type": "string"
-                    },
-                    "strMeasure3": {
-                        "type": "string"
-                    },
-                    "strMeasure4": {
-                        "type": "string"
-                    },
-                    "strMeasure5": {
-                        "type": "string"
-                    },
-                    "strMeasure6": {
-                        "type": "string"
-                    },
-                    "strMeasure7": {
-                        "type": "string"
-                    },
-                    "strMeasure8": {
-                        "type": "string"
-                    },
-                    "strMeasure9": {
-                        "type": "string"
-                    },
-                    "strMeasure10": {
-                        "type": "string"
-                    },
-                    "strMeasure11": {
-                        "type": "string"
-                    },
-                    "strMeasure12": {
-                        "type": "string"
-                    },
-                    "strMeasure13": {
-                        "type": "string"
-                    },
-                    "strMeasure14": {
-                        "type": "string"
-                    },
-                    "strMeasure15": {
-                        "type": "string"
-                    },
-                    "strMeasure16": {
-                        "type": "string"
-                    },
-                    "strMeasure17": {
-                        "type": "string"
-                    },
-                    "strMeasure18": {
-                        "type": "string"
-                    },
-                    "strMeasure19": {
-                        "type": "string"
-                    },
-                    "strMeasure20": {
-                        "type": "string"
-                    },
-                    "strSource": {
-                        "type": "string"
-                    },
-                    "strImageSource": {
-                        "type": "string"
-                    },
-                    "strCreativeCommonsConfirmed": {
-                        "type": "string"
-                    },
-                    "dateModified": {
-                        "type": "string"
-                    }
-                }
-            },
-            "MealCategory": {
-              "type": "string",
-              "enum": [
-                "beef",
-                "breakfast",
-                "chicken",
-                "dessert",
-                "goat",
-                "lamb",
-                "miscellaneous",
-                "pasta",
-                "pork",
-                "seafood",
-                "side",
-                "starter",
-                "vegan",
-                "vegetarian"
-              ]
-            },
-        }
+    "version": "1.0.11"
+  },
+  "externalDocs": {
+    "description": "Find out more about Swagger",
+    "url": "http://swagger.io"
+  },
+  "servers": [
+    {
+      "url": "https://www.themealdb.com"
     }
+  ],
+  "tags": [
+    {
+      "name": "meals",
+      "description": "Some tasty stuff"
+    }           ],
+  "paths": {
+    "/api/json/v1/1/filter.php": {
+      "get": {
+        "tags": [
+          "meals"
+        ],
+        "summary": "List meals in category",
+        "description": "List meals for a specified category",
+        "operationId": "fetchCategoryMeals",
+        "parameters": [
+          {
+            "name": "c",
+            "in": "query",
+            "description": "The category name",
+            "required": true,
+            "schema": {
+              "description": "Meal category name",
+              "example": "dessert",
+              "$ref": "#/components/schemas/MealCategory"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MealsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid status value"
+          }
+        }
+      }
+    },
+    "/api/json/v1/1/lookup.php": {
+      "get": {
+        "tags": [
+          "meals"
+        ],
+        "summary": "Meal details",
+        "description": "Lookup the details for a specified meal",
+        "operationId": "fetchMealDetails",
+        "parameters": [
+          {
+            "name": "i",
+            "in": "query",
+            "description": "The meal ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "description": "the meal",
+              "example": 52772
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MealDetailResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid status value"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "MealsResponse": {
+        "type": "object",
+        "properties": {
+          "meals": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Meal"
+            }
+          }
+        }
+      },
+      "MealDetailResponse": {
+        "type": "object",
+        "properties": {
+          "meals": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MealDetail"
+            }
+          }
+        }
+      },
+      "Meal": {
+        "type": "object",
+        "properties": {
+          "strMeal": {
+            "type": "string"
+          },
+          "strMealThumb": {
+            "type": "string",
+            "format": "uri"
+          },
+          "idMeal": {
+            "type": "string"
+          }
+        }
+      },
+      "MealDetail": {
+        "type": "object",
+        "properties": {
+          "idMeal": {
+            "type": "string"
+          },
+          "strMeal": {
+            "type": "string"
+          },
+          "strDrinkAlternate": {
+            "type": "string"
+          },
+          "strCategory": {
+            "type": "string"
+          },
+          "strArea": {
+            "type": "string"
+          },
+          "strInstructions": {
+            "type": "string"
+          },
+          "strMealThumb": {
+            "type": "string",
+            "format": "uri"
+          },
+          "strTags": {
+            "type": "string"
+          },
+          "strYoutube": {
+            "type": "string",
+            "format": "uri"
+          },
+          "strIngredient1": {
+            "type": "string"
+          },
+          "strIngredient2": {
+            "type": "string"
+          },
+          "strIngredient3": {
+            "type": "string"
+          },
+          "strIngredient4": {
+            "type": "string"
+          },
+          "strIngredient5": {
+            "type": "string"
+          },
+          "strIngredient6": {
+            "type": "string"
+          },
+          "strIngredient7": {
+            "type": "string"
+          },
+          "strIngredient8": {
+            "type": "string"
+          },
+          "strIngredient9": {
+            "type": "string"
+          },
+          "strIngredient10": {
+            "type": "string"
+          },
+          "strIngredient11": {
+            "type": "string"
+          },
+          "strIngredient12": {
+            "type": "string"
+          },
+          "strIngredient13": {
+            "type": "string"
+          },
+          "strIngredient14": {
+            "type": "string"
+          },
+          "strIngredient15": {
+            "type": "string"
+          },
+          "strIngredient16": {
+            "type": "string"
+          },
+          "strIngredient17": {
+            "type": "string"
+          },
+          "strIngredient18": {
+            "type": "string"
+          },
+          "strIngredient19": {
+            "type": "string"
+          },
+          "strIngredient20": {
+            "type": "string"
+          },
+          "strMeasure1": {
+            "type": "string"
+          },
+          "strMeasure2": {
+            "type": "string"
+          },
+          "strMeasure3": {
+            "type": "string"
+          },
+          "strMeasure4": {
+            "type": "string"
+          },
+          "strMeasure5": {
+            "type": "string"
+          },
+          "strMeasure6": {
+            "type": "string"
+          },
+          "strMeasure7": {
+            "type": "string"
+          },
+          "strMeasure8": {
+            "type": "string"
+          },
+          "strMeasure9": {
+            "type": "string"
+          },
+          "strMeasure10": {
+            "type": "string"
+          },
+          "strMeasure11": {
+            "type": "string"
+          },
+          "strMeasure12": {
+            "type": "string"
+          },
+          "strMeasure13": {
+            "type": "string"
+          },
+          "strMeasure14": {
+            "type": "string"
+          },
+          "strMeasure15": {
+            "type": "string"
+          },
+          "strMeasure16": {
+            "type": "string"
+          },
+          "strMeasure17": {
+            "type": "string"
+          },
+          "strMeasure18": {
+            "type": "string"
+          },
+          "strMeasure19": {
+            "type": "string"
+          },
+          "strMeasure20": {
+            "type": "string"
+          },
+          "strSource": {
+            "type": "string"
+          },
+          "strImageSource": {
+            "type": "string"
+          },
+          "strCreativeCommonsConfirmed": {
+            "type": "string"
+          },
+          "dateModified": {
+            "type": "string"
+          }
+        }
+      },
+      "MealCategory": {
+        "type": "string",
+        "enum": [
+          "beef",
+          "breakfast",
+          "chicken",
+          "dessert",
+          "goat",
+          "lamb",
+          "miscellaneous",
+          "pasta",
+          "pork",
+          "seafood",
+          "side",
+          "starter",
+          "vegan",
+          "vegetarian"
+        ]
+      },
+    }
+  }
 }
+

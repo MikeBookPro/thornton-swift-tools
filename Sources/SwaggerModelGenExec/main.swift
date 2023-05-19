@@ -2,7 +2,7 @@ import Foundation
 
 let arguments = ProcessInfo().arguments
 if arguments.count < 3 {
-    print("missing arguments")
+  print("missing arguments")
 }
 let (input, output) = (arguments[1], arguments[2])
 
@@ -21,3 +21,4 @@ import NetworkDownloadServices
 \(SwaggerModel.NetworkAPI.string(for: swagger))
 """
 try code.write(to: URL(fileURLWithPath: output), atomically: true, encoding: .utf8)
+
